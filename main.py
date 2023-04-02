@@ -65,7 +65,7 @@ def run(args):
 
 
     # initialize wandb
-    #wandb.init(name=args.exp_name, project='PANDA-WJ', config=args)
+    wandb.init(name=args.exp_name, project='PANDA-WJ', config=args)
 
     # fitting model
     fit(model        = model, 

@@ -9,6 +9,7 @@ from collections import OrderedDict
 import utils
 from losses import CompactnessLoss, EWCLoss
 import tqdm
+from typing import Optional
 
 _logger = logging.getLogger('train')
 
@@ -44,18 +45,18 @@ def fit(
     print('Epoch: {}, AUROC is: {}'.format(0, auc))
 
     center = torch.FloatTensor(feature_space).mean(dim=0)
-    critertion = CompactnessLoss(center.to(device))  
+    criterion = CompactnessLoss(center.to(device))  
 
     for epoch in range(epochs):
         _logger.info(f'\nEpoch: {epoch+1}/{epochs}')
-        running_loss = run_epoch(model, trainloader, optimizer, log_interval, device, ewc, ewc_loss)
+        running_loss = run_epoch(model, trainloader, criterion, optimizer, log_interval, device, ewc, ewc_loss)
         auc, feature_space = get_score(model, device, trainloader, testloader)
 
         # wandb
         metrics = OrderedDict(lr=optimizer.param_groups[0]['lr'])
         metrics.update([(k, v) for k, v in running_loss.items()])
         metrics.update([("AUROC", auc)])
-        #wandb.log(metrics, step=step)
+        wandb.log(metrics, step=step)
 
         step += 1
 
@@ -76,7 +77,7 @@ def fit(
 
 
 
-def run_epoch(model, dataloader, criterion, optimizer, log_interval: int, device: str, ewc:bool, ewc_loss) -> dict:   
+def run_epoch(model, dataloader, criterion, optimizer, log_interval: int, device: str, ewc:bool, ewc_loss: Optional[float]) -> dict:   
     batch_time_m = AverageMeter()
     data_time_m = AverageMeter()
     running_loss = AverageMeter()
