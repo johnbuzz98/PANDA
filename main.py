@@ -43,7 +43,7 @@ def run(args):
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     _logger.info('Device: {}'.format(device))
 
-    #TODO PANDA의 옵션 OPTIMIZATION, EWC
+    
     # load model
     model = resnet.get_resnet_model(resnet_type=args.resnet_type)
     model.to(device)
@@ -54,7 +54,7 @@ def run(args):
     trainloader, testloader = get_loaders(dataset=args.dataset, label_class=args.label, batch_size=args.batch_size)
     # set training
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-5)
-
+    #TODO PANDA의 옵션 OPTIMIZATION, EWC /(여기 순서 바꿔 )
     #EWC?
     if args.ewc:
         frozen_model = deepcopy(model).to(device)
@@ -86,7 +86,7 @@ if __name__=='__main__':
     parser.add_argument('--datadir', default='./data', help='dataset directory')
     parser.add_argument('--diag_path', default='./data/fisher_diagonal.pth', help='fim diagonal path')
     parser.add_argument('--savedir', default='./save', help='save directory')
-    parser.add_argument('--ewc', default=False, help='Train with EWC')
+    parser.add_argument('--ewc', default=True, help='Train with EWC')
     parser.add_argument('--label', default=0, type=int, help='The normal class')
     parser.add_argument('--lr', type=float, default=1e-2, help='The initial learning rate.')
     parser.add_argument('--resnet-type', default=152, type=int, help='which resnet to use')
