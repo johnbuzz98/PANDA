@@ -1,38 +1,31 @@
-dataname=$1
-num_classes=$2
-opt_list='SGD'
-lr_list='0.1 0.01 0.001'
-aug_list='default weak strong'
-bs_list='16 64 256'
+dataname='cifar10 fashion'
+label_list='0 1 2 3 4 5 6 7 8 9'
+panda_list='ewc es ses'
+batch_size=32
+epochs=20
+lr=1e-2
 
-for bs in $bs_list
+for data in $dataname
 do
-    for opt in $opt_list
+    for label in $label_list
     do
-        for lr in $lr_list
+        for pandatype in $panda_list
         do
-            for aug in $aug_list
-            do
-                # use scheduler
-                echo "bs: $bs, opt: $opt, lr: $lr, aug: $aug, use_sched: True"
-                EXP_NAME="bs_$bs-opt_$opt-lr_$lr-aug_$aug-use_sched"
-                
-                if [ -d "$EXP_NAME" ]
-                then
-                    echo "$EXP_NAME is exist"
-                else
-                    python main.py \
-                        --exp-name $EXP_NAME \
-                        --dataname $dataname \
-                        --num-classes $num_classes \
-                        --opt-name $opt \
-                        --aug-name $aug \
-                        --batch-size $bs \
-                        --lr $lr \
-                        --use_scheduler \
-                        --epochs 50
-                fi
-            done
+        echo "data: $data, label: $label, panda: $panda, batch_size: $batch_size, epochs: $epochs, lr: $lr"
+        EXP_NAME="data_$data-label_$label-panda_$panda-bs_$batch_size-epochs_$epochs-lr_$lr"
+        if [ -d "$EXP_NAME" ]
+        then
+            echo "$EXP_NAME is exist"
+        else
+            python main.py \
+                --exp-name $EXP_NAME \
+                --dataname $data \
+                --label $label \
+                --pandatype $pandatype \
+                --batch-size $batch_size \
+                --epochs $epochs \
+                --lr $lr
+        fi
         done
     done
 done

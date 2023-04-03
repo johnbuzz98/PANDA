@@ -43,58 +43,64 @@ def run(args):
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     _logger.info('Device: {}'.format(device))
 
-    
     # load model
     model = resnet.get_resnet_model(resnet_type=args.resnet_type)
     model.to(device)
     _logger.info('# of params: {}'.format(np.sum([p.numel() for p in model.parameters()])))
-
-    # load dataset
     # load dataloader
     trainloader, testloader = get_loaders(dataset=args.dataset, label_class=args.label, batch_size=args.batch_size)
     # set training
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-5)
-    #TODO PANDA의 옵션 OPTIMIZATION, EWC /(여기 순서 바꿔 )
+
     #EWC?
-    if args.ewc:
+    ewc_loss=None
+    ses = False
+    if args.pandatype == 'ewc':
+        ewc = True
         frozen_model = deepcopy(model).to(device)
         frozen_model.eval()
         freeze_model(frozen_model)
         fisher = torch.load(args.diag_path)
         ewc_loss = EWCLoss(frozen_model, fisher)
 
+    elif args.pandatype == 'es':
+        args.epochs = 15
+        ewc = False
+    elif args.pandatype == 'ses':
+        ewc = False
+        ses = True
+    else:
+        raise NotImplementedError
 
     # initialize wandb
     wandb.init(name=args.exp_name, project='PANDA-WJ', config=args)
-
+    #sample wise early stopping 이랑 simple early stopping  만들어야ㅕ함
     # fitting model
     fit(model        = model, 
         trainloader  = trainloader, 
         testloader   = testloader, 
-        ewc          = args.ewc,
+        ewc          = ewc,
+        ewc_loss     = ewc_loss,
         optimizer    = optimizer, 
-        epochs       = args.epochs, 
+        epochs       = args.epochs,
         savedir      = savedir,
         log_interval = args.log_interval,
+        ses          = ses,  
         device       = device)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description="PANDA TEST")
 
     parser.add_argument('--exp-name', type=str, default='PANDA', help='experiment name')
-    parser.add_argument('--dataset', default='cifar10',  help='Cifar10 or Fashion')
+    parser.add_argument('--dataset', default='fashion',  help='cifar10 or fashion')
     parser.add_argument('--datadir', default='./data', help='dataset directory')
-    parser.add_argument('--diag_path', default='./data/fisher_diagonal.pth', help='fim diagonal path')
+    parser.add_argument('--diag_path', default='./data/fisher_diagonal.pth', help='fisher matrix diagonal path')
     parser.add_argument('--savedir', default='./save', help='save directory')
-    parser.add_argument('--ewc', default=True, help='Train with EWC')
+    parser.add_argument('--pandatype', type=str, default='ses', help='ewc, es, ses')
     parser.add_argument('--label', default=0, type=int, help='The normal class')
     parser.add_argument('--lr', type=float, default=1e-2, help='The initial learning rate.')
     parser.add_argument('--resnet-type', default=152, type=int, help='which resnet to use')
-    parser.add_argument('--pretrained', action='store_true', help='use pretrained model')
     parser.add_argument('--finetune-layer', default=[3,4], type=list, help='which layer to finetune')
-
-    #Anomaly Scoring
-    parser.add_argument('--score',type=str,help='anomaly scoring method')
 
     # train
     parser.add_argument('--epochs',type=int,default=20,help='the number of epochs')
