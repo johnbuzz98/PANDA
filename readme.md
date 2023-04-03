@@ -1,4 +1,4 @@
-# PANDA for Inference
+# PANDA
 Unofficial implemntation of PANDA 
 
 ## Datasets
