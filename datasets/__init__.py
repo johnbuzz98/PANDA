@@ -1,2 +1,2 @@
-from .factory import get_loaders, get_outliers_loader
+from .factory import get_loaders
 from .MVTec import MVTecAD
