@@ -51,18 +51,18 @@ def fit(
         auc, feature_space = get_score(model, device, trainloader, testloader)
 
          # check every 5 epochs, train feature space
-        
-        if epoch % 5 == 0:
-            anomaly_dist, _ = get_avg_distance(model, device, trainloader, testloader)
-            if best_anomaly_dist <= anomaly_dist:
-                best_anomaly_dist = anomaly_dist
-                torch.save(model.state_dict(), os.path.join(savedir, f'best_model.pt'))
-                _logger.info('Best anomaly distance: {}'.format(best_anomaly_dist))
+        if ses:
+            if epoch % 5 == 0:
+                anomaly_dist, _ = get_avg_distance(model, device, trainloader, testloader)
+                if best_anomaly_dist <= anomaly_dist:
+                    best_anomaly_dist = anomaly_dist
+                    torch.save(model.state_dict(), os.path.join(savedir, f'best_model.pt'))
+                    _logger.info('Best anomaly distance: {}'.format(best_anomaly_dist))
 
-            #else early stop
-            else:
-                _logger.info('Early stop')
-                break
+                #else early stop
+                else:
+                    _logger.info('Early stop')
+                    break
             
 
         # wandb
