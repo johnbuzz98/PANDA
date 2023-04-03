@@ -44,14 +44,14 @@ def fit(
 
     center = torch.FloatTensor(feature_space).mean(dim=0)
     criterion = CompactnessLoss(center.to(device))  
-
+    best_anomaly_dist =0
     for epoch in range(epochs):
         _logger.info(f'\nEpoch: {epoch+1}/{epochs}')
         running_loss = run_epoch(model, trainloader, criterion, optimizer, log_interval, device, ewc, ewc_loss)
         auc, feature_space = get_score(model, device, trainloader, testloader)
 
          # check every 5 epochs, train feature space
-        best_anomaly_dist =0
+        
         if epoch % 5 == 0:
             anomaly_dist, _ = get_avg_distance(model, device, trainloader, testloader)
             if best_anomaly_dist <= anomaly_dist:
@@ -82,12 +82,10 @@ def fit(
 
             # save model
             torch.save(model.state_dict(), os.path.join(savedir, f'best_model.pt'))
-            
             _logger.info('Best AUROC {0:.3%} to {1:.3%}'.format(best_auroc, auc))
-
             best_auroc = auc
 
-        _logger.info('Best Metric: {0:.3%} (epoch {1:})'.format(state['best_auroc'], state['best_epoch']))
+    _logger.info('Best Metric: {0:.3%} (epoch {1:})'.format(state['best_auroc'], state['best_epoch']))
 
 
 
@@ -134,7 +132,7 @@ def run_epoch(model, dataloader, criterion, optimizer, log_interval: int, device
    
         end = time.time()
     
-    return OrderedDict([('loss',running_loss.avg)])
+    return OrderedDict([('compactness_loss',running_loss.avg)])
         
 def get_score(model, device, trainloader, testloader):
 

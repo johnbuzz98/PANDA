@@ -1,11 +1,11 @@
 import torchvision.transforms as transforms
 import numpy as np
 import faiss
-
+"""
 mvtype = ['bottle', 'cable', 'capsule', 'carpet', 'grid', 'hazelnut', 'leather',
           'metal_nut', 'pill', 'screw', 'tile', 'toothbrush', 'transistor',
           'wood', 'zipper']
-
+"""
 
 def freeze_model(model):
     for param in model.parameters():

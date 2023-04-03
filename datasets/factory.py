@@ -1,12 +1,9 @@
-import os
 from torch.utils.data import DataLoader
 from .MVTec import MVTecAD
 import torch
 import torchvision
 import numpy as np
 import torchvision.transforms as transforms
-from typing import Optional
-
 transform_color = transforms.Compose([transforms.Resize(256),
                                       transforms.CenterCrop(224),
                                       transforms.ToTensor(),
@@ -46,12 +43,12 @@ def get_loaders(dataset, label_class, batch_size):
     else:
         print('Unsupported Dataset')
         exit()
-
+"""
 def get_outliers_loader(batch_size):
     dataset = torchvision.datasets.ImageFolder(root='./data/tiny', transform=transform_color)
     outlier_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0)
     return outlier_loader
-
+"""
 def _convert_label(x):
     '''
     convert anomaly label. 0: normal; 1: anomaly.

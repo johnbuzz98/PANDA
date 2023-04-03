@@ -2,7 +2,7 @@ dataname='cifar10 fashion'
 label_list='0 1 2 3 4 5 6 7 8 9'
 panda_list='ewc es ses'
 batch_size=32
-epochs=20
+epochs=50
 lr=1e-2
 
 for data in $dataname

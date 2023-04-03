@@ -74,7 +74,7 @@ def run(args):
 
     # initialize wandb
     wandb.init(name=args.exp_name, project='PANDA-WJ', config=args)
-    #sample wise early stopping 이랑 simple early stopping  만들어야ㅕ함
+    
     # fitting model
     fit(model        = model, 
         trainloader  = trainloader, 
@@ -100,10 +100,8 @@ if __name__=='__main__':
     parser.add_argument('--label', default=0, type=int, help='The normal class')
     parser.add_argument('--lr', type=float, default=1e-2, help='The initial learning rate.')
     parser.add_argument('--resnet-type', default=152, type=int, help='which resnet to use')
-    parser.add_argument('--finetune-layer', default=[3,4], type=list, help='which layer to finetune')
-
     # train
-    parser.add_argument('--epochs',type=int,default=20,help='the number of epochs')
+    parser.add_argument('--epochs',type=int,default=50,help='the number of epochs')
     parser.add_argument('--batch-size',type=int,default=32,help='batch size')
     parser.add_argument('--log-interval',type=int,default=10,help='log interval')
 
