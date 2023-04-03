@@ -19,7 +19,7 @@ do
         else
             python main.py \
                 --exp-name $EXP_NAME \
-                --dataname $data \
+                --dataset $data \
                 --label $label \
                 --pandatype $pandatype \
                 --batch-size $batch_size \
